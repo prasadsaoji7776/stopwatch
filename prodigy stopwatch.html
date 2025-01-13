@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .stopwatch {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .time {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-size: 1rem;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #ddd;
+        }
+
+        .laps {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+
+        .lap {
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="stopwatch">
+        <div class="time" id="time">00:00:00</div>
+        <div class="buttons">
+            <button id="start">Start</button>
+            <button id="pause">Pause</button>
+            <button id="reset">Reset</button>
+            <button id="lap">Lap</button>
+        </div>
+        <div class="laps" id="laps"></div>
+    </div>
+
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval;
+
+        const timeDisplay = document.getElementById('time');
+        const lapsContainer = document.getElementById('laps');
+
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        function updateDisplay() {
+            const currentTime = Date.now();
+            elapsedTime = currentTime - startTime;
+            timeDisplay.textContent = formatTime(elapsedTime);
+        }
+
+        document.getElementById('start').addEventListener('click', () => {
+            if (!timerInterval) {
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(updateDisplay, 1000);
+            }
+        });
+
+        document.getElementById('pause').addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            elapsedTime = 0;
+            timeDisplay.textContent = '00:00:00';
+            lapsContainer.innerHTML = '';
+        });
+
+        document.getElementById('lap').addEventListener('click', () => {
+            if (timerInterval) {
+                const lapTime = document.createElement('div');
+                lapTime.className = 'lap';
+                lapTime.textContent = formatTime(elapsedTime);
+                lapsContainer.appendChild(lapTime);
+            }
+        });
+    </script>
+</body>
+</html>
